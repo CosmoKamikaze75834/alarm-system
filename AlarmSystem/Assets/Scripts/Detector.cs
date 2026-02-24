@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class Door : MonoBehaviour
+public class Detector : MonoBehaviour
 {
     public event Action HouseLogged;
     public event Action HouseLeft;

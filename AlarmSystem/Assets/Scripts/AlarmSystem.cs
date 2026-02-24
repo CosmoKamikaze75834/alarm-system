@@ -5,63 +5,45 @@ public class AlarmSystem : MonoBehaviour
 {
     [SerializeField] private AudioSource _source;
     [SerializeField] private float _fadeSpeed;
-    [SerializeField] private Door _door;
 
     private Coroutine _coroutine;
     private float _volumeMax = 1f;
     private float _volumeMin = 0f;
 
-    private void OnEnable()
-    {
-        _door.HouseLogged += StartChallenge;
-        _door.HouseLeft += StopChallenge;
-    }
-
-    private void OnDisable()
-    {
-        _door.HouseLogged -= StartChallenge;
-        _door.HouseLeft -= StopChallenge;
-    }
-
-    private void StartChallenge()
+    public void StartChallenge()
     {
         if(_coroutine != null)
         {
             StopCoroutine(_coroutine);
-            _coroutine = null;
         }
 
-        _coroutine = StartCoroutine(IncreaseVolume());
+        _coroutine = StartCoroutine(ChangeVolume(_volumeMax));
     }
 
-    private void StopChallenge()
+    public void StopChallenge()
     {
-        if (_coroutine != null)
+        if(_coroutine != null)
         {
             StopCoroutine(_coroutine);
-            _coroutine = null;
         }
 
-        StartCoroutine(DecreaseVolume());
+        _coroutine = StartCoroutine(ChangeVolume(_volumeMin));
     }
 
-    private IEnumerator IncreaseVolume()
+    private IEnumerator ChangeVolume(float targetVolume)
     {
         _source.Play();
 
-        while (_source.volume < 1f)
+        while (_source.volume != targetVolume)
         {
-            _source.volume = Mathf.MoveTowards(_source.volume, _volumeMax, _fadeSpeed * Time.deltaTime);
+            _source.volume = Mathf.MoveTowards(_source.volume, targetVolume, _fadeSpeed * Time.deltaTime);
+
             yield return null;
         }
-    }
 
-    private IEnumerator DecreaseVolume()
-    {
-        while (_source.volume > 0f)
+        if(_source.volume == _volumeMin)
         {
-            _source.volume = Mathf.MoveTowards(_source.volume, _volumeMin, _fadeSpeed * Time.deltaTime);
-            yield return null;
+            _source.Stop();
         }
     }
 }
